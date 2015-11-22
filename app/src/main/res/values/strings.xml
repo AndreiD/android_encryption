@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">EncryptedAPI</string>
+    <string name="secret_key">secret key</string>
+    <string name="aes">AES</string>
+    <string name="rsa">RSA</string>
+    <string name="about">Font: White Rabbit Created By: Matthew Welch</string>
+</resources>
