@@ -6,8 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.androidadvance.encryptedapi.security.AESCipher;
-import com.androidadvance.encryptedapi.security.RSACipher;
+import com.androidadvance.encryptedapi.security.RSAHelper;
 import com.squareup.okhttp.ResponseBody;
 
 import org.androidannotations.annotations.AfterViews;
@@ -15,12 +14,10 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.HashMap;
 
+import com.androidadvance.encryptedapi.security.AESHelper;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -51,25 +48,28 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.button_aes) void aes_clicked() {
 
-        //---- you can get it like this. delete this lines after you have the value.
-//        String secret = AESCipher.HiddenKeys.encode("RFLDSKJ)U$#@FDSKJ@$#@#!@#E_This is a super secret key...");
-//        Log.e("secret",secret);
+        AESHelper myCipher = AESHelper.getInstance();
+
+        //---- AES Encryption -----
+        byte[] bytes_to_be_encripted = new byte[0];
+        try {
+            bytes_to_be_encripted = editText_plain_data.getText().toString().getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        byte[] encrypted_bytes = myCipher.encrypt(bytes_to_be_encripted);
+        textView_encrypted.setText(new String(encrypted_bytes));
+
+        //--- AES Decryption -------
+        byte[] decrypted_bytes = myCipher.decrypt(encrypted_bytes);
+        textView_decrypted.setText(new String(decrypted_bytes));
 
 
-        AESCipher myCipher = AESCipher.getInstance();
-        String encrypted_s = myCipher.encrypt_string(editText_plain_data.getText().toString());
-
-        textView_encrypted.setText(encrypted_s);
-        textView_status.append("Encrypted" + "\n");
-
-
-        textView_decrypted.setText(myCipher.decrypt_string(encrypted_s));
-
+        //---------- SERVER COMMUNICATION ----------
         start_time = System.currentTimeMillis();
-
         HashMap<String, Object> hm = new HashMap<>();
         hm.put("time_on_device", System.currentTimeMillis());
-        hm.put("encrypted_data", encrypted_s);
+        hm.put("encrypted_data", new String(encrypted_bytes));
 
         Call<Object> call = mContext.getMyAPI().postToServer(hm);
         call.enqueue(new Callback<Object>() {
@@ -83,44 +83,65 @@ public class MainActivity extends BaseActivity {
                 } else {
                     int statusCode = response.code();
                     ResponseBody errorBody = response.errorBody();
-                    Log.e("request failed", "Status code: " + String.valueOf(statusCode) + " ErrorBody:" + errorBody.toString());
+                    textView_status.setText("Status code: " + String.valueOf(statusCode) + " ErrorBody:" + errorBody.toString());
                 }
             }
 
             @Override public void onFailure(Throwable t) {
                 Log.e("onFailure", t.getMessage());
+                textView_status.setText("server: " + t.getMessage());
             }
         });
-
-
+        //---------- END SERVER PART ----------
     }
+
 
     @Click(R.id.button_rsa) void rsa_clicked() {
 
-
-        PublicKey pubKey = null;
+        byte[] bytes_to_be_encrypted = new byte[0];
         try {
-            pubKey = new RSACipher.PublicKeyReader().get(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        byte[] encrypted_bytes = new byte[0];
-        try {
-            encrypted_bytes = RSACipher.encrypt(pubKey, editText_plain_data.getText().toString().getBytes("utf-8"));
+            bytes_to_be_encrypted = editText_plain_data.getText().toString().getBytes("utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        //---- RSA Encryption -----
+        byte[] encrypted_bytes = RSAHelper.encrypt(new RSAHelper().getPublicKey(mContext), bytes_to_be_encrypted);
         textView_encrypted.setText(new String(encrypted_bytes));
 
-        PrivateKey privKey = null;
-        try {
-            privKey = new RSACipher.PrivateKeyReader().get(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        textView_decrypted.setText(new String(RSACipher.decrypt(privKey,encrypted_bytes)));
+        //---- RSA Decrypt -----
+        byte[] decrypted_bytes = RSAHelper.decrypt(new RSAHelper().getPrivateKey(mContext), encrypted_bytes);
+        textView_decrypted.setText(new String(decrypted_bytes));
 
 
+        //---------- SERVER COMMUNICATION ----------
+        start_time = System.currentTimeMillis();
+        HashMap<String, Object> hm = new HashMap<>();
+        hm.put("time_on_device", System.currentTimeMillis());
+        hm.put("encrypted_data", new String(encrypted_bytes));
+
+        Call<Object> call = mContext.getMyAPI().postToServer(hm);
+        call.enqueue(new Callback<Object>() {
+            @Override public void onResponse(Response<Object> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    Object mPojo = response.body();
+                    if (mPojo != null) {
+                        textView_status.setText(mPojo.toString());
+                    }
+                    textView_status.append("\n done in " + String.valueOf(System.currentTimeMillis() - start_time) + " ms");
+                } else {
+                    int statusCode = response.code();
+                    ResponseBody errorBody = response.errorBody();
+                    textView_status.setText("Status code: " + String.valueOf(statusCode) + " ErrorBody:" + errorBody.toString());
+                }
+            }
+
+            @Override public void onFailure(Throwable t) {
+                Log.e("onFailure", t.getMessage());
+                textView_status.setText("server: " + t.getMessage());
+            }
+        });
+        //---------- END SERVER PART ----------
 
     }
 
