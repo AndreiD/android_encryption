@@ -24,6 +24,7 @@ public class AESHelper {
     private static byte[] ivBytes;
     private static AESHelper instance = null;
     private static String the_secret;
+    private static Cipher cipher = null;
     private MessageDigest md = null;
     private byte[] keyBytes;
 
@@ -34,11 +35,13 @@ public class AESHelper {
         try {
             md = MessageDigest.getInstance("SHA-256");
             keyBytes = the_secret.getBytes("utf-8");
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            cipher = Cipher.getInstance(cipherTransformation);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
         md.update(keyBytes);
         keyBytes = md.digest();
+
 
     }
 
@@ -54,7 +57,7 @@ public class AESHelper {
     public byte[] encrypt(byte[] mes) {
         try {
             SecretKeySpec newKey = new SecretKeySpec(keyBytes, aesEncryptionAlgorithm);
-            Cipher cipher = Cipher.getInstance(cipherTransformation);
+
             SecureRandom random = new SecureRandom();
             AESHelper.ivBytes = new byte[16];
             random.nextBytes(AESHelper.ivBytes);
@@ -64,7 +67,7 @@ public class AESHelper {
             System.arraycopy(mes, 0, destination, ivBytes.length, mes.length);
             return cipher.doFinal(destination);
 
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
             e.printStackTrace();
         }
         return null;
@@ -77,10 +80,9 @@ public class AESHelper {
             byte[] codB = Arrays.copyOfRange(bytes, 16, bytes.length);
             AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivB);
             SecretKeySpec newKey = new SecretKeySpec(keyBytes, aesEncryptionAlgorithm);
-            Cipher cipher = Cipher.getInstance(cipherTransformation);
             cipher.init(Cipher.DECRYPT_MODE, newKey, ivSpec);
             return cipher.doFinal(codB);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             e.printStackTrace();
         }
         return null;
