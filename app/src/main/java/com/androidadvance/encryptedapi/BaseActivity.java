@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
         );
 
 
-        //--------- initialize retrofit shit ------
+        //--------- retrofit shit ------
         Retrofit mretrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

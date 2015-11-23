@@ -10,6 +10,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,9 +26,19 @@ import javax.crypto.Cipher;
 //$ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
 
 public class RSAHelper {
+    private static RSAHelper instance = null;
 
+    private RSAHelper() {
+    }
 
-    public PublicKey getPublicKey(Context ctx) {
+    public static RSAHelper get_instance() {
+        if (instance == null) {
+            instance = new RSAHelper();
+        }
+        return instance;
+    }
+
+    public static PublicKey getPublicKey(Context ctx) {
         try {
             InputStream is = ctx.getAssets().open("public_key.der");
             byte[] fileBytes = new byte[is.available()];
@@ -48,8 +59,7 @@ public class RSAHelper {
     }
 
 
-
-    public PrivateKey getPrivateKey(Context ctx) {
+    public static PrivateKey getPrivateKey(Context ctx) {
         try {
             InputStream is = ctx.getAssets().open("private_key.der");
             byte[] fileBytes = new byte[is.available()];

@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import com.androidadvance.encryptedapi.security.AESHelper;
+
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -48,7 +49,7 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.button_aes) void aes_clicked() {
 
-        AESHelper myCipher = AESHelper.getInstance();
+        AESHelper myCipher = AESHelper.get_instance("fldksaj3rifldsfjasdfsafdlsfak"); // <-- keep this string secret.
 
         //---- AES Encryption -----
         byte[] bytes_to_be_encripted = new byte[0];
@@ -106,11 +107,11 @@ public class MainActivity extends BaseActivity {
         }
 
         //---- RSA Encryption -----
-        byte[] encrypted_bytes = RSAHelper.encrypt(new RSAHelper().getPublicKey(mContext), bytes_to_be_encrypted);
+        byte[] encrypted_bytes = RSAHelper.encrypt(RSAHelper.get_instance().getPublicKey(mContext), bytes_to_be_encrypted);
         textView_encrypted.setText(new String(encrypted_bytes));
 
         //---- RSA Decrypt -----
-        byte[] decrypted_bytes = RSAHelper.decrypt(new RSAHelper().getPrivateKey(mContext), encrypted_bytes);
+        byte[] decrypted_bytes = RSAHelper.decrypt(RSAHelper.get_instance().getPrivateKey(mContext), encrypted_bytes);
         textView_decrypted.setText(new String(decrypted_bytes));
 
 
