@@ -17,6 +17,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
 
@@ -97,7 +98,12 @@ public class MainActivity extends BaseActivity {
     @Click(R.id.button_rsa) void rsa_clicked() {
 
 
-        PublicKey pubKey = new RSACipher.PublicKeyReader().get();
+        PublicKey pubKey = null;
+        try {
+            pubKey = new RSACipher.PublicKeyReader().get(mContext);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         byte[] encrypted_bytes = new byte[0];
         try {
             encrypted_bytes = RSACipher.encrypt(pubKey, editText_plain_data.getText().toString().getBytes("utf-8"));
@@ -105,6 +111,14 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
         }
         textView_encrypted.setText(new String(encrypted_bytes));
+
+        PrivateKey privKey = null;
+        try {
+            privKey = new RSACipher.PrivateKeyReader().get(mContext);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        textView_decrypted.setText(new String(RSACipher.decrypt(privKey,encrypted_bytes)));
 
 
 

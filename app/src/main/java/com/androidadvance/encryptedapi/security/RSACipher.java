@@ -1,5 +1,6 @@
 package com.androidadvance.encryptedapi.security;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -15,53 +16,37 @@ public class RSACipher {
 
     public static class PublicKeyReader {
 
-        public PublicKey get() {
-            InputStream inputStream2 = getClass().getResourceAsStream("/assets/mypublickey.key");
-            InputStreamReader reader = new InputStreamReader(inputStream2);
-            BufferedReader br = new BufferedReader(reader);
-            StringBuffer sb = new StringBuffer();
-            String line;
-            try {
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String pk = sb.toString();
-            byte[] decoded = Base64.decode(pk, Base64.DEFAULT);
-            KeyFactory kf = null;
-            try {
-                kf = KeyFactory.getInstance("RSA");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-            RSAPublicKey pubKey = null;
-            try {
-                pubKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(decoded));
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
-            return pubKey;
+        public PublicKey get(Context ctx) throws Exception {
+
+            InputStream is = ctx.getAssets().open("public_key.der");
+            byte[] fileBytes = new byte[is.available()];
+            is.read(fileBytes);
+            is.close();
+
+            X509EncodedKeySpec spec =
+                    new X509EncodedKeySpec(fileBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            return kf.generatePublic(spec);
         }
     }
 
 
     public static class PrivateKeyReader {
 
-        public PrivateKey get(String filename)
+        public PrivateKey get(Context ctx)
                 throws Exception {
 
-            File f = new File(filename);
-            FileInputStream fis = new FileInputStream(f);
-            DataInputStream dis = new DataInputStream(fis);
-            byte[] keyBytes = new byte[(int) f.length()];
-            dis.readFully(keyBytes);
-            dis.close();
 
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            InputStream is = ctx.getAssets().open("private_key.der");
+            byte[] fileBytes = new byte[is.available()];
+            is.read(fileBytes);
+            is.close();
+
+            PKCS8EncodedKeySpec spec =
+                    new PKCS8EncodedKeySpec(fileBytes);
             KeyFactory kf = KeyFactory.getInstance("RSA");
             return kf.generatePrivate(spec);
+
         }
     }
 
