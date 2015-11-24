@@ -72,6 +72,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
 
+
+    //-------- in memory ------------
+
     public final void test_1mb_in_memory_AESEncryption() {
         Log.i("TESTING AES 1mb", "__________________________ AES ON 1mb FILE IN MEMORY___________________");
         AESHelper myCipher = AESHelper.get_instance("34dfsf23rsdafsa34dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r4dfas32r4");
@@ -118,52 +121,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
 
-    public final void test_1mb_in_memory_RSAEncryption() {
-        Log.i("TESTING RSA 1mb", "__________________________ RSA ON 1mb FILE IN MEMORY___________________");
-
-
-        long start_time = System.currentTimeMillis();
-
-
-        StringBuilder sb = new StringBuilder();
-        InputStream fis = null;
-        try {
-            fis = getContext().getAssets().open("1mbfile.dic");
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(isr);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (fis != null) fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //---- AES Encryption -----
-        byte[] bytes_to_be_encrypted = new byte[0];
-        try {
-            bytes_to_be_encrypted = sb.toString().getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //---- RSA Encryption -----
-        PublicKey publicKey = RSAHelper.get_instance().getPublicKey(getContext());
-        byte[] encrypted_bytes = RSAHelper.encrypt(publicKey, bytes_to_be_encrypted);
-
-        //---- RSA Decrypt -----
-        PrivateKey privateKey = RSAHelper.get_instance().getPrivateKey(getContext());
-        byte[] decrypted_bytes = RSAHelper.decrypt(privateKey, encrypted_bytes);
-        assertEquals(new String(decrypted_bytes), sb.toString());
-
-        Log.d("RSA MEMORY FINISHED IN ", String.valueOf(System.currentTimeMillis() - start_time) + "ms");
-
-    }
+    //-------- lines: one by one ------------
 
     public final void test_1mb_AESEncryption() {
         Log.i("TESTING AES 1mb", "__________________________ AES ON 1mb FILE one by one_____________");
