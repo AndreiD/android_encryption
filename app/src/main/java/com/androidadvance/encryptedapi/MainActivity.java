@@ -17,7 +17,7 @@ import org.androidannotations.annotations.ViewById;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import com.androidadvance.encryptedapi.security.AESHelper;
+import com.androidadvance.encryptedapi.security.AESHelper_Old;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.button_aes) void aes_clicked() {
 
-        AESHelper myCipher = AESHelper.get_instance("fldksaj3rifldsfjasdfsafdlsfak"); // <-- keep this string secret.
+        AESHelper_Old myCipher = AESHelper_Old.get_instance("fldksaj3rifldsfjasdfsafdlsfak"); // <-- keep this string secret.
 
         //---- AES Encryption -----
         byte[] bytes_to_be_encripted = new byte[0];

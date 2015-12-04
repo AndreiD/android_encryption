@@ -4,11 +4,10 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.util.Log;
 
-import com.androidadvance.encryptedapi.security.AESHelper;
+import com.androidadvance.encryptedapi.security.AESHelper_Old;
 import com.androidadvance.encryptedapi.security.RSAHelper;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +34,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         Log.i("TESTING AES", "__________________________ AES ___________________");
         String secret_message = "this is a secret message!";
 
-        AESHelper myCipher = AESHelper.get_instance("fdssdfawefdsfdasfas");
+        AESHelper_Old myCipher = AESHelper_Old.get_instance("fdssdfawefdsfdasfas");
         //---- AES Encryption -----
         byte[] bytes_to_be_encripted = new byte[0];
         try {
@@ -77,7 +76,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public final void test_1mb_in_memory_AESEncryption() {
         Log.i("TESTING AES 1mb", "__________________________ AES ON 1mb FILE IN MEMORY___________________");
-        AESHelper myCipher = AESHelper.get_instance("34dfsf23rsdafsa34dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r4dfas32r4");
+        AESHelper_Old myCipher = AESHelper_Old.get_instance("34dfsf23rsdafsa34dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r4dfas32r4");
         long start_time = System.currentTimeMillis();
 
 
@@ -125,7 +124,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public final void test_1mb_AESEncryption() {
         Log.i("TESTING AES 1mb", "__________________________ AES ON 1mb FILE one by one_____________");
-        AESHelper myCipher = AESHelper.get_instance("34dfsf23rsdafsa34dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r4dfas32r4");
+        AESHelper_Old myCipher = AESHelper_Old.get_instance("34dfsf23rsdafsa34dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r434dfsf23rsdafsadfas32r4dfas32r4");
         long start_time = System.currentTimeMillis();
         InputStream inputStream = null;
         Scanner sc = null;
