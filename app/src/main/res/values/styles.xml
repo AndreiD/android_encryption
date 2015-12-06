@@ -11,7 +11,6 @@
         <item name="colorControlNormal">@color/colorControlNormal</item>
         <item name="colorControlHighlight">@color/colorPrimary</item>
 
-        <item name="android:windowBackground">@color/windowBackground</item>
 
 
     </style>
